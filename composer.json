@@ -1,0 +1,14 @@
+{
+    "name": "sumpygump/greg",
+    "description": "CLI tool for managing personal goals",
+    "authors": [
+        {
+            "name": "Jansen Price",
+            "email": "jansen.price@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "7.*"
+    },
+    "bin": ["bin/greg"]
+}

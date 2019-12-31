@@ -1,0 +1,50 @@
+#!/usr/bin/env php
+<?php
+# ---------------------------
+#      ▄▄  ▄▄▄   ▄▄   ▄▄
+#     █  █ █  ▀ █▄▄█ █  █
+#     ▀▄▄█ █    ▀▄▄▄ ▀▄▄█
+#     ▄▄▄▀           ▄▄▄▀
+# ---------------------------
+# Greg Regularly Evokes Goals
+
+$config = require_once dirname(__DIR__) . '/init.php';
+$greg = new \Greg\Greg($config);
+$client = new \Greg\Client($greg);
+
+$cmd = 'remind'; // default command
+if (isset($argv[1])) {
+    $cmd = trim($argv[1]);
+}
+
+switch ($cmd) {
+case 'list':
+    $return = $client->list();
+    break;
+case 'add':
+    $return = $client->add($argv);
+    break;
+case 'remind':
+    $return = $client->remind();
+    break;
+case 'complete':
+    $return = $client->complete($argv);
+    break;
+case 'help':
+case '--help':
+case '-h':
+    $return = $client->help();
+    break;
+case 'version':
+case '--version':
+case '-v':
+    printf("Greg version %s\n", \Greg\Greg::VERSION);
+    $return = 0;
+    break;
+default:
+    printf("Unrecognized command '%s'\n", $cmd);
+    $return = $client->help();
+    break;
+}
+
+exit($return);
