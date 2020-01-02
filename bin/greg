@@ -27,6 +27,9 @@ case 'add':
 case 'remind':
     $return = $client->remind();
     break;
+case 'progress':
+    $return = $client->progress($argv);
+    break;
 case 'complete':
     $return = $client->complete($argv);
     break;

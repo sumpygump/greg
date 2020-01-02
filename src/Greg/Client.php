@@ -2,6 +2,8 @@
 
 namespace Greg;
 
+use Greg\Exception\GoalNotFoundException;
+
 /**
  * Client
  *
@@ -98,21 +100,11 @@ class Client
      */
     public function complete($argv = [])
     {
-        $goals = $this->greg->getActiveGoals();
-        if (!isset($argv[2])) {
-            foreach ($goals as $i => $goal) {
-                print $this->greg->goalToString($goal, $i + 1 . ". ");
-            }
-            print "Which goal would you like to mark complete? ";
-            $input = rtrim(fgets(STDIN));
-        } else {
-            $input = trim($argv[2]);
-        }
-
-        $goal = $this->greg->getGoalById($input);
-        if (!$goal) {
-            print "No goal found for input '$input'\n";
-            return 0;
+        try {
+            $goal = $this->promptForGoal($argv, "\nWhich goal would you like to mark complete? ");
+        } catch (GoalNotFoundException $e) {
+            print $e->getMessage() . "\n";
+            return 1;
         }
 
         $this->greg->markComplete($goal);
@@ -120,6 +112,119 @@ class Client
         print $this->greg->goalToString($goal, "☑ ");
 
         return 0;
+    }
+
+    /**
+     * Add progress to a goal
+     *
+     * @param array $argv
+     * @return int
+     */
+    public function progress($argv = [])
+    {
+        try {
+            $goal = $this->promptForGoal($argv, "\nFor which goal would you like to add progress? ");
+        } catch (GoalNotFoundException $e) {
+            print $e->getMessage() . "\n";
+            return 1;
+        }
+
+        print $this->greg->goalToString($goal, "% ");
+
+        $pstatus = $this->promptForProgressStatus();
+        print $pstatus . " -- got it.\n";
+
+        $notes = $this->promptForNotes();
+
+        $progress_record = [
+            'datetime' => date('Y-m-d H:i:s'),
+            'status' => $pstatus,
+            'notes' => $notes,
+        ];
+        $this->greg->addProgress($goal, $progress_record);
+        print "Progress recorded.\n";
+
+        return 0;
+    }
+
+    /**
+     * Prompt to get a goal by index or id
+     *
+     * @param array $argv Input from command
+     * @param string $text Message of the prompt
+     * @return object Goal object
+     */
+    private function promptForGoal($argv = [], $text = "Which goal would you like to select? ")
+    {
+        $goals = $this->greg->getActiveGoals();
+
+        if (!isset($argv[2])) {
+            print "G O A L S\n";
+            foreach ($goals as $i => $goal) {
+                print $this->greg->goalToString($goal, $i + 1 . ". ");
+            }
+            print $text;
+            $input = rtrim(fgets(STDIN));
+            print "\n";
+        } else {
+            $input = trim($argv[2]);
+        }
+
+        $goal = $this->greg->getGoalById($input);
+        if (!$goal) {
+            $error = "No goal found for input '$input'";
+            throw new GoalNotFoundException($error);
+        }
+
+        return $goal;
+    }
+
+    /**
+     * Prompt for progress status
+     *
+     * @param string $text
+     * @return string
+     */
+    private function promptForProgressStatus()
+    {
+        $statuses = Greg::$progress_statuses;
+
+        $valid_responses = [];
+        $prompt_pstatus = [];
+        foreach ($statuses as $key => $status) {
+            $prompt_pstatus[] = ($key) . ': ' . $status;
+            $valid_responses[] = $key;
+        }
+
+        do {
+            $prompt = "How are you progressing in this goal? (" . implode(' ', $prompt_pstatus) . ")? ";
+            print $prompt;
+
+            $input = strtolower(rtrim(fgets(STDIN)));
+            if ($input == 'q') {
+                return false;
+            }
+
+            if (in_array($input, $valid_responses)) {
+                return Greg::$progress_statuses[$input];
+            }
+
+            print "Invalid response '" . $input . "' (use 'q' to cancel)\n";
+        } while (!in_array($input, $valid_responses));
+    }
+
+    /**
+     * Prompt for notes
+     *
+     * @param string $text
+     * @return string
+     */
+    private function promptForNotes($text = "Add notes for your progress")
+    {
+        print "$text:\n> ";
+        $input = rtrim(fgets(STDIN));
+
+        return $input;
     }
 
     /**
@@ -138,12 +243,13 @@ class Client
         print "Usage:\n";
         print "  greg <cmd> [arguments]\n";
         print "Commands:\n";
-        print "  help        Show this help message\n";
-        print "  list        Show list of goals\n";
-        print "  add <goal>  Add a new goal\n";
-        print "  remind      Show goal reminder for today\n";
-        print "  complete    Mark a goal as complete\n";
-        print "  version     Show version of greg\n";
+        print "  help           Show this help message\n";
+        print "  list           Show list of goals\n";
+        print "  add <goal>     Add a new goal\n";
+        print "  remind         Show goal reminder for today\n";
+        print "  progress [id]  Mark your progress for a goal\n";
+        print "  complete [id]  Mark a goal as complete\n";
+        print "  version        Show version of greg\n";
 
         return 0;
     }

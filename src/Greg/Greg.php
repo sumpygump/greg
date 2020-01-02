@@ -11,10 +11,29 @@ namespace Greg;
 class Greg
 {
     const VERSION = '1.0';
+
+    // Goal statuses
     const STATUS_ACTIVE = 'active';
     const STATUS_COMPLETED = 'completed';
     const STATUS_CANCELED = 'canceled';
+
+    // Progress statuses
+    const PSTATUS_ONTRACK = 'on-track';
+    const PSTATUS_SLIPPING = 'slipping';
+    const PSTATUS_FAILING = 'failing';
+
     const START_DATE = '2019-12-01';
+
+    /**
+     * Progress statuses
+     *
+     * @var array
+     */
+    public static $progress_statuses = [
+        '1' => self::PSTATUS_ONTRACK,
+        '2' => self::PSTATUS_SLIPPING,
+        '3' => self::PSTATUS_FAILING,
+    ];
 
     /**
      * Configuration array
@@ -89,6 +108,8 @@ class Greg
             'id' => random_int(10000, 99999),
             'name' => $goal_text,
             'status' => self::STATUS_ACTIVE,
+            'pstatus' => '',
+            'progress' => [],
             'date_created' => date('Y-m-d H:i:s'),
             'date_completed' => '',
         ];
@@ -155,7 +176,12 @@ class Greg
      */
     public function goalToString($goal, $prefix = '')
     {
-        return sprintf("%s%s (since %s) [%s]\n", $prefix, $goal->name, date('Y-m-d', strtotime($goal->date_created)), $goal->id);
+        $pstatus = '';
+        if (isset($goal->pstatus) && $goal->pstatus) {
+            $pstatus = " ~" . $goal->pstatus;
+        }
+
+        return sprintf("%s%s (since %s) [%s]%s\n", $prefix, $goal->name, date('Y-m-d', strtotime($goal->date_created)), $goal->id, $pstatus);
     }
 
     /**
@@ -187,6 +213,24 @@ class Greg
         return false;
     }
 
+    public function addProgress($input_goal, $record)
+    {
+        // TODO I could just index the goals array by goal id and then I don't
+        // need to cycle through to find it
+        foreach ($this->goals as &$goal) {
+            if ($input_goal->id == $goal->id) {
+                if (!isset($goal->progress)) {
+                    $goal->progress = [];
+                }
+
+                $goal->pstatus = $record['status'];
+                $goal->progress[] = $record;
+            }
+        }
+
+        $this->saveGoals();
+    }
+
     /**
      * Mark a goal as complete and save goals to data file
      *
@@ -195,6 +239,8 @@ class Greg
      */
     public function markComplete($input_goal)
     {
+        // TODO I could just index the goals array by goal id and then I don't
+        // need to cycle through to find it
         foreach ($this->goals as &$goal) {
             if ($input_goal->id == $goal->id) {
                 $goal->status = self::STATUS_COMPLETED;
