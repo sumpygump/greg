@@ -12,14 +12,27 @@ $config = require_once dirname(__DIR__) . '/init.php';
 $greg = new \Greg\Greg($config);
 $client = new \Greg\Client($greg);
 
-$cmd = 'remind'; // default command
-if (isset($argv[1])) {
-    $cmd = trim($argv[1]);
+$arg_rules = [
+    'table|t' => 'Show list as table',
+    'version|v' => 'Show version',
+    'help|h' => 'Show help',
+    'arg:command' => 'Command',
+];
+$arguments = new Qi_Console_ArgV($argv, $arg_rules);
+
+if ($arguments->help) {
+    exit($client->help());
 }
 
-switch ($cmd) {
+if ($arguments->version) {
+    printf("Greg version %s\n", \Greg\Greg::VERSION);
+    exit(0);
+}
+
+switch ($arguments->command) {
+case '': // passthru
 case 'list':
-    $return = $client->list();
+    $return = $client->list($arguments->table);
     break;
 case 'add':
     $return = $client->add($argv);
@@ -37,18 +50,14 @@ case 'complete':
     $return = $client->complete($argv);
     break;
 case 'help':
-case '--help':
-case '-h':
     $return = $client->help();
     break;
 case 'version':
-case '--version':
-case '-v':
     printf("Greg version %s\n", \Greg\Greg::VERSION);
     $return = 0;
     break;
 default:
-    printf("Unrecognized command '%s'\n", $cmd);
+    printf("Unrecognized command '%s'\n", $arguments->command);
     $return = $client->help();
     break;
 }

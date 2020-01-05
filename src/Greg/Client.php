@@ -3,6 +3,7 @@
 namespace Greg;
 
 use Greg\Exception\GoalNotFoundException;
+use Qi_Console_Tabular;
 
 /**
  * Client
@@ -35,7 +36,7 @@ class Client
      *
      * @return int
      */
-    public function list()
+    public function list($as_table = false)
     {
         $goals = $this->greg->getActiveGoals();
         if (empty($goals)) {
@@ -43,11 +44,41 @@ class Client
             return 1;
         }
 
-        foreach ($goals as $i => $goal) {
-            print $this->greg->goalToString($goal, $i+1 . ". ");
+        if ($as_table) {
+            $this->displayListTable($goals);
+        } else {
+            foreach ($goals as $i => $goal) {
+                print $this->greg->goalToString($goal, $i+1 . ". ");
+            }
         }
 
         return 0;
+    }
+
+    /**
+     * Display goals in a table
+     *
+     * @param array $goals
+     * @return void
+     */
+    private function displayListTable($goals)
+    {
+        $headers = ["Goal", "Id", "Status", "Last comment"];
+        $table = [];
+        foreach ($goals as $i => $goal) {
+            $table[] = [
+                $i + 1 . ". " . $goal->name,
+                $goal->id,
+                $this->greg->getPStatus($goal),
+                $this->greg->getLastComment($goal),
+            ];
+        }
+
+        $tabular = new Qi_Console_Tabular(
+            $table,
+            ['headers' => $headers]
+        );
+        $tabular->display();
     }
 
     /**
@@ -270,7 +301,9 @@ class Client
         print "▄▄▄▀           ▄▄▄▀\n";
         print "\n";
         print "Usage:\n";
-        print "  greg <cmd> [arguments]\n";
+        print "  greg [options] <cmd> [arguments]\n";
+        print "Options:\n";
+        print "  -t --table     Show list of goals in table\n";
         print "Commands:\n";
         print "  help           Show this help message\n";
         print "  list           Show list of goals\n";

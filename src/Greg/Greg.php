@@ -10,7 +10,7 @@ namespace Greg;
  */
 class Greg
 {
-    const VERSION = '1.0';
+    const VERSION = '1.1';
 
     // Goal statuses
     const STATUS_ACTIVE = 'active';
@@ -176,6 +176,17 @@ class Greg
      */
     public function goalToString($goal, $prefix = '')
     {
+        return sprintf("%s%s [%s]%s\n", $prefix, $goal->name, $goal->id, $this->getPStatus($goal));
+    }
+
+    /**
+     * Get progress status and last date from goal
+     *
+     * @param object $goal
+     * @return string
+     */
+    public function getPStatus($goal)
+    {
         $pstatus = '';
         if (isset($goal->pstatus) && $goal->pstatus) {
             $pstatus = " ~" . $goal->pstatus;
@@ -191,7 +202,23 @@ class Greg
             $progress_date = " (as of " . date('d M Y', strtotime($last_progress->datetime)) . ")";
         }
 
-        return sprintf("%s%s [%s]%s%s\n", $prefix, $goal->name, $goal->id, $pstatus, $progress_date);
+        return $pstatus . $progress_date;
+    }
+
+    /**
+     * Get last progress comment
+     *
+     * @param object $goal
+     * @return string
+     */
+    public function getLastComment($goal)
+    {
+        if (isset($goal->progress) && count($goal->progress) > 0) {
+            $last_progress = $goal->progress[count($goal->progress) - 1];
+            return $last_progress->notes;
+        }
+
+        return '';
     }
 
     /**
