@@ -277,6 +277,7 @@ class Client
         print "  add <goal>     Add a new goal\n";
         print "  remind         Show goal reminder for today\n";
         print "  progress [id]  Mark your progress for a goal\n";
+        print "  detail [id]    Show progress detail for a goal\n";
         print "  complete [id]  Mark a goal as complete\n";
         print "  version        Show version of greg\n";
 

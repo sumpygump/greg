@@ -181,7 +181,17 @@ class Greg
             $pstatus = " ~" . $goal->pstatus;
         }
 
-        return sprintf("%s%s (since %s) [%s]%s\n", $prefix, $goal->name, date('Y-m-d', strtotime($goal->date_created)), $goal->id, $pstatus);
+        $last_progress = '';
+        if (isset($goal->progress) && count($goal->progress) > 0) {
+            $last_progress = $goal->progress[count($goal->progress) - 1];
+        }
+
+        $progress_date = '';
+        if ($pstatus && $last_progress) {
+            $progress_date = " (as of " . date('d M Y', strtotime($last_progress->datetime)) . ")";
+        }
+
+        return sprintf("%s%s [%s]%s%s\n", $prefix, $goal->name, $goal->id, $pstatus, $progress_date);
     }
 
     /**
