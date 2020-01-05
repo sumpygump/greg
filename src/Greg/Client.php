@@ -148,6 +148,35 @@ class Client
     }
 
     /**
+     * Get detail of a goal
+     *
+     * @param array $argv
+     * @return int
+     */
+    public function detail($argv = [])
+    {
+        try {
+            $goal = $this->promptForGoal($argv, "\nSelect goal: ");
+        } catch (GoalNotFoundException $e) {
+            print $e->getMessage() . "\n";
+            return 1;
+        }
+
+        print $this->greg->goalToString($goal, "% ");
+        if (isset($goal->progress)) {
+            print "Progress\n";
+            print "--------\n";
+            foreach ($goal->progress as $progress) {
+                printf("* %s : %s\n  %s\n", $progress->datetime, $progress->status, $progress->notes);
+            }
+        } else {
+            print "No progress recorded.\n";
+        }
+
+        return 0;
+    }
+
+    /**
      * Prompt to get a goal by index or id
      *
      * @param array $argv Input from command

@@ -30,6 +30,9 @@ case 'remind':
 case 'progress':
     $return = $client->progress($argv);
     break;
+case 'detail':
+    $return = $client->detail($argv);
+    break;
 case 'complete':
     $return = $client->complete($argv);
     break;
