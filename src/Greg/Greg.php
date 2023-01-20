@@ -6,11 +6,11 @@ namespace Greg;
  * Greg kernel class
  *
  * @package Greg
- * @author Jansen Price <jansen.price@gmail.com>
+ * @author  Jansen Price <jansen.price@gmail.com>
  */
 class Greg
 {
-    const VERSION = '1.1';
+    const VERSION = '1.2';
 
     // Goal statuses
     const STATUS_ACTIVE = 'active';
@@ -66,7 +66,7 @@ class Greg
     /**
      * Constructor
      *
-     * @param array $config
+     * @param  array $config
      * @return void
      */
     public function __construct($config)
@@ -99,7 +99,7 @@ class Greg
     /**
      * Add a goal to the list and save data file
      *
-     * @param string $goal_text
+     * @param  string $goal_text
      * @return object Resulting goal object
      */
     public function addGoal($goal_text)
@@ -170,8 +170,8 @@ class Greg
     /**
      * Convert a goal object to string
      *
-     * @param object $goal
-     * @param string $prefix
+     * @param  object $goal
+     * @param  string $prefix
      * @return string
      */
     public function goalToString($goal, $prefix = '')
@@ -182,7 +182,7 @@ class Greg
     /**
      * Get progress status and last date from goal
      *
-     * @param object $goal
+     * @param  object $goal
      * @return string
      */
     public function getPStatus($goal)
@@ -208,7 +208,7 @@ class Greg
     /**
      * Get last progress comment
      *
-     * @param object $goal
+     * @param  object $goal
      * @return string
      */
     public function getLastComment($goal)
@@ -226,7 +226,7 @@ class Greg
      *
      * Returns resulting goal object or false if not found
      *
-     * @param int $id
+     * @param  int $id
      * @return object|false
      */
     public function getGoalById($id)
@@ -271,7 +271,7 @@ class Greg
     /**
      * Mark a goal as complete and save goals to data file
      *
-     * @param object $input_goal Goal object
+     * @param  object $input_goal Goal object
      * @return void
      */
     public function markComplete($input_goal)

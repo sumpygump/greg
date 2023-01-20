@@ -8,7 +8,7 @@
         }
     ],
     "require": {
-        "php": "7.*",
+        "php": ">=7.4",
         "sumpygump/qi-console": "^1.3"
     },
     "bin": ["bin/greg"]
