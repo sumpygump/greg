@@ -46,8 +46,7 @@ function get_user_home($app_dir = '.greg')
     if (!empty($home)) {
         // home should never end with a trailing slash.
         $home = rtrim($home, '/');
-    }
-    elseif (!empty($_SERVER['HOMEDRIVE']) && !empty($_SERVER['HOMEPATH'])) {
+    } elseif (!empty($_SERVER['HOMEDRIVE']) && !empty($_SERVER['HOMEPATH'])) {
         // home on windows
         $home = $_SERVER['HOMEDRIVE'] . $_SERVER['HOMEPATH'];
         // If HOMEPATH is a root directory the path can end with a slash. Make sure

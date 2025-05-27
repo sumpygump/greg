@@ -48,7 +48,7 @@ class Client
             $this->displayListTable($goals);
         } else {
             foreach ($goals as $i => $goal) {
-                print $this->greg->goalToString($goal, $i+1 . ". ");
+                print $this->greg->goalToString($goal, $i + 1 . ". ");
             }
         }
 
@@ -230,7 +230,7 @@ class Client
             $input = trim($argv[2]);
         }
 
-        $goal = $this->greg->getGoalById($input);
+        $goal = $this->greg->getGoalById((int) $input);
         if (!$goal) {
             $error = "No goal found for input '$input'";
             throw new GoalNotFoundException($error);
@@ -242,7 +242,6 @@ class Client
     /**
      * Prompt for progress status
      *
-     * @param string $text
      * @return string
      */
     private function promptForProgressStatus()
@@ -262,7 +261,7 @@ class Client
 
             $input = strtolower(rtrim(fgets(STDIN)));
             if ($input == 'q') {
-                return false;
+                return "";
             }
 
             if (in_array($input, $valid_responses)) {
@@ -271,6 +270,8 @@ class Client
 
             print "Invalid response '" . $input . "' (use 'q' to cancel)\n";
         } while (!in_array($input, $valid_responses));
+
+        return "";
     }
 
     /**

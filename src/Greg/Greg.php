@@ -10,19 +10,19 @@ namespace Greg;
  */
 class Greg
 {
-    const VERSION = '1.2';
+    public const VERSION = '1.2';
 
     // Goal statuses
-    const STATUS_ACTIVE = 'active';
-    const STATUS_COMPLETED = 'completed';
-    const STATUS_CANCELED = 'canceled';
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_COMPLETED = 'completed';
+    public const STATUS_CANCELED = 'canceled';
 
     // Progress statuses
-    const PSTATUS_ONTRACK = 'on-track';
-    const PSTATUS_SLIPPING = 'slipping';
-    const PSTATUS_FAILING = 'failing';
+    public const PSTATUS_ONTRACK = 'on-track';
+    public const PSTATUS_SLIPPING = 'slipping';
+    public const PSTATUS_FAILING = 'failing';
 
-    const START_DATE = '2019-12-01';
+    public const START_DATE = '2019-12-01';
 
     /**
      * Progress statuses
@@ -85,7 +85,7 @@ class Greg
     /**
      * Load goals from data file
      *
-     * @return void
+     * @return bool
      */
     public function loadGoals()
     {
@@ -94,6 +94,7 @@ class Greg
         }
 
         $this->goals = json_decode(file_get_contents($this->goals_db));
+        return true;
     }
 
     /**
